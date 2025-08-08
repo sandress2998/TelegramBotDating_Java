@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: TelegramBotDating_Java
+  main:
+    banner-mode: off
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres_database
+    username: username
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+
+telegram:
+  bot:
+    token: 7500494810:AAGWEe2-Ov3wtRI1sjitIl3yzCHpXL1wu2Y
+    username: DatingKt_bot
+
+logging:
+  level:
+    org:
+      telegram: DEBUG
+

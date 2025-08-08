@@ -1,0 +1,12 @@
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: monitoring-postgres-db
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres_database
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_tgbot_dating_kt:/var/lib/postgresql/data
