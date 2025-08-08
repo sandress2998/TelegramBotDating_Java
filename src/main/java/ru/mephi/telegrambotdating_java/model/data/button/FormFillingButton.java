@@ -5,13 +5,13 @@ import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
 import ru.mephi.telegrambotdating_java.database.entity.ActivityButtonChat;
-import ru.mephi.telegrambotdating_java.database.repository.TelegramBotRepository;
+import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 
 import java.util.UUID;
 
 public class FormFillingButton extends AbstractInput {
     @Override
-    public SendMessage handle(SpareMessageData data, TelegramBotRepository repository) {
+    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
         if (repository == null) {
             return new InternalErrorResponse(data.getChatId(), "Repository is null");
         }

@@ -4,14 +4,16 @@ import org.springframework.data.jdbc.repository.query.Modifying;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.mephi.telegrambotdating_java.database.entity.ActivityButtonChat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TelegramBotRepository extends CrudRepository<ActivityButtonChat, UUID> {
+public interface ActivityButtonChatRepository extends CrudRepository<ActivityButtonChat, UUID> {
 
     ActivityButtonChat getByChatId(UUID chatId);
 
@@ -45,4 +47,10 @@ public interface TelegramBotRepository extends CrudRepository<ActivityButtonChat
             " deactivation_code = null, address = null, dating_time = null, activation_time = null," +
             " next_available = :nextAvailableTime WHERE chat_id = :chatId", nativeQuery = true)
     void resetCountdownData(UUID chatId, LocalDateTime nextAvailableTime);
+
+    List<ActivityButtonChat> getActivityButtonChatByActivationTimeIsAfter(LocalDateTime activationTime);
+
+    @Modifying
+    @Query("DELETE FROM AlarmToSend a WHERE a.id IN :ids")
+    void deleteAllByIds(@Param("ids") List<UUID> ids);
 }

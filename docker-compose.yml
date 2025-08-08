@@ -1,7 +1,7 @@
 services:
   postgres-db:
     image: postgres:latest
-    container_name: monitoring-postgres-db
+    container_name: tgbot_postgres
     environment:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
@@ -10,3 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data_tgbot_dating_java:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_tgbot_dating_java:

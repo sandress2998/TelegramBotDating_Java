@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
-import ru.mephi.telegrambotdating_java.database.repository.TelegramBotRepository;
+import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class EmergencyActivationButton extends AbstractInput {
     @Override
-    public SendMessage handle(SpareMessageData data, TelegramBotRepository repository) {
+    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
         if (repository == null) {
             return new SendMessage(data.getChatId(), "Repository is null");
         }

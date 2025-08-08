@@ -1,7 +1,7 @@
 package ru.mephi.telegrambotdating_java.model.data.text_message;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.mephi.telegrambotdating_java.database.repository.TelegramBotRepository;
+import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
@@ -25,17 +25,17 @@ public class AlarmSendingForm extends AbstractInput {
     }
 
     @Override
-    public SendMessage handle(SpareMessageData data, TelegramBotRepository repository) {
+    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
         if (repository == null) {
             return new InternalErrorResponse(data.getChatId(), "Request is null");
         }
         try {
             repository.updateAlarmSendingForm(
-                    UUID.fromString(data.getChatId()),
-                    receiverTag,
-                    deactivationCode != null ? Integer.parseInt(deactivationCode) : null,
-                    address,
-                    datingTime
+                UUID.fromString(data.getChatId()),
+                receiverTag,
+                deactivationCode != null ? Integer.parseInt(deactivationCode) : null,
+                address,
+                datingTime
             );
             return new SendMessage(data.getChatId(), "Анкета успешно обновилась.");
         } catch (Exception e) {

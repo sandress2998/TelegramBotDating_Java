@@ -3,7 +3,7 @@ package ru.mephi.telegrambotdating_java.model.data.button;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import ru.mephi.telegrambotdating_java.database.repository.TelegramBotRepository;
+import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 
@@ -12,9 +12,10 @@ import java.util.List;
 
 public class StartButton extends AbstractInput {
     @Override
-    public SendMessage handle(SpareMessageData data, TelegramBotRepository repository) {
+    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
         SendMessage message = new SendMessage(data.getChatId(), "Привет! Я помогу обеспечить твою безопасность.\n" +
-                "Для лучшего понимания работы бота нажмите на кнопку *Информация*");
+                "Для лучшего понимания работы бота нажмите на кнопку *Информация*\n" +
+                "Следующим сообщением введите временный код доступа, который Вы сгенерировали в приложении");
 
         ReplyKeyboardMarkup replyMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();

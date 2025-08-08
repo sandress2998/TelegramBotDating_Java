@@ -4,10 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.mephi.telegrambotdating_java.database.repository.TelegramBotRepository;
+import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InvalidDataInput;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.UnknownInput;
 import ru.mephi.telegrambotdating_java.model.data.button.*;
+import ru.mephi.telegrambotdating_java.model.data.text_message.AuthorizationCodeIncoming;
 import ru.mephi.telegrambotdating_java.model.data.text_message.DeactivationCodeIncoming;
 import ru.mephi.telegrambotdating_java.model.service.TelegramBotService;
 
@@ -20,11 +21,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TelegramBotServiceImpl implements TelegramBotService {
     @Autowired
-    private TelegramBotRepository repository;
+    private ActivityButtonChatRepository repository;
 
     @Transactional
     @Override
@@ -109,6 +111,14 @@ public class TelegramBotServiceImpl implements TelegramBotService {
             }
             return new InvalidDataInput("Нужно ввести четырехзначное число");
         } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private AbstractInput tryParseToAuthorizationCode(SpareMessageData data) {
+        try {
+            return new AuthorizationCodeIncoming(UUID.fromString(data.getText()));
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }
