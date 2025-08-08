@@ -22,7 +22,6 @@ server:
 
 telegram:
   bot:
-    token: 7500494810:AAGWEe2-Ov3wtRI1sjitIl3yzCHpXL1wu2Y
     username: DatingKt_bot
 
 logging:

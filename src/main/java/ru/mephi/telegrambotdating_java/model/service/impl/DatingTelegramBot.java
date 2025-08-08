@@ -16,12 +16,11 @@ public class DatingTelegramBot extends TelegramLongPollingBot {
     private final TelegramBotService telegramBotService;
 
     public DatingTelegramBot(
-            @Value("${telegram.bot.token}") String botToken,
             @Value("${telegram.bot.username}") String botUsername,
             TelegramBotService telegramBotService
     ) {
-        super(botToken);
-        this.botToken = botToken;
+        super(System.getenv("TELEGRAM_TOKEN"));
+        this.botToken = System.getenv("TELEGRAM_TOKEN");
         this.botUsername = botUsername;
         this.telegramBotService = telegramBotService;
     }
