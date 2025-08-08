@@ -20,6 +20,6 @@ public class ClientController {
 
     @PostMapping
     AuthorizationCode generateNewClient() {
-        return repository.save(new AuthorizationCode());
+        return repository.save(AuthorizationCode.generateRandom());
     }
 }

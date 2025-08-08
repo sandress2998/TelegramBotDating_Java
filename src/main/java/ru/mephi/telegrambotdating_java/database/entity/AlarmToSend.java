@@ -10,6 +10,9 @@ public class AlarmToSend {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
 
+    @Column(name = "chat_id", unique = true, nullable = false)
+    public String chatId;
+
     @Column(nullable = false)
     public int retries = 3;
 
@@ -19,7 +22,8 @@ public class AlarmToSend {
     @Column(nullable = false)
     public String text;
 
-    public AlarmToSend(String receiver, String text) {
+    public AlarmToSend(String chatId, String receiver, String text) {
+        this.chatId = chatId;
         this.receiver = receiver;
         this.text = text;
     }

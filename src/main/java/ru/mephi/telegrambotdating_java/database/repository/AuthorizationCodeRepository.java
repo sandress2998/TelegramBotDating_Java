@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface AuthorizationCodeRepository extends CrudRepository<AuthorizationCode, UUID> {
-    public AuthorizationCode getByCode(UUID code);
+    public AuthorizationCode getByCodeAndExpiresAtAfter(UUID code, LocalDateTime expiresAt);
 
     public void deleteByCode(UUID code);
 

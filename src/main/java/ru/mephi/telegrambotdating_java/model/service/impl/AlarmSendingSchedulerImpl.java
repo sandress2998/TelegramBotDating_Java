@@ -43,10 +43,15 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
 
         // 3. Подчищаем данные о полученных анкетах, ставим следующую доступную анкету через сутки
         row.forEach(it -> {
-            activityButtonRepository.resetCountdownData(it.id, LocalDateTime.now().plusDays(1));
+            activityButtonRepository.resetCountdownData(it.chatId, LocalDateTime.now().plusDays(1));
         });
     }
 
+
+    /** пытается отправить alarm у всех людей, чья анкета в данный момент готова к отправке
+     * если не получается, то retries уменьшается на 1, или запись вообще удаляется
+     * если получается, то запись удаляется из таблицы, если retries = 0)
+     */
     @Scheduled(fixedRate = 60000)  // 60 000 мс = 1 минута
     @Transactional
     @Override
@@ -54,9 +59,6 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
         // извлекаем все alarms, которые необходимо отправить.
         List<AlarmToSend> alarms = alarmToSendRepository.getAll();
 
-        // пытаемся отправить alarm
-        // если не получается, то retries уменьшается на 1, или запись вообще удаляется, если retries = 0)
-        // если получается, то запись удаляется из таблицы
         alarms.forEach(alarm -> {
             try {
                 Chat newChat = bot.execute(new GetChat(alarm.receiver));

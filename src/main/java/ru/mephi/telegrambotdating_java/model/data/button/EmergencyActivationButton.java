@@ -39,9 +39,9 @@ public class EmergencyActivationButton extends AbstractInput {
 
         int secondsRemaining = 60;
 
-        repository.updateCountdownStatus(UUID.fromString(chatId), true);
+        repository.updateCountdownStatus(data.getChatId(), true);
         startTimer(sender, secondsRemaining, data.getChatId(), sentMessage.getMessageId());
-        repository.updateCountdownStatus(UUID.fromString(chatId), false);
+        repository.updateCountdownStatus(data.getChatId(), false);
 
         return initialMessage;
     }

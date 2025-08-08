@@ -19,4 +19,15 @@ public class AuthorizationCode {
 
     @Column(name = "expires_at", nullable = false)
     public LocalDateTime expiresAt;
+
+    /** Метод для тестирования
+     */
+    static public AuthorizationCode generateRandom() {
+        AuthorizationCode data = new AuthorizationCode();
+        data.id = UUID.randomUUID();
+        data.code = UUID.randomUUID();
+        data.clientId = UUID.randomUUID();
+        data.expiresAt = LocalDateTime.now().plusHours(1);
+        return data;
+    }
 }

@@ -11,7 +11,6 @@ import ru.mephi.telegrambotdating_java.model.data.bad_request.InvalidDataInput;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 public class ActivationTimeIncoming extends AbstractInput {
     private final LocalDateTime time;
@@ -26,13 +25,13 @@ public class ActivationTimeIncoming extends AbstractInput {
             return new InternalErrorResponse(data.getChatId(), "Repository is null");
         }
 
-        UUID chatId = UUID.fromString(data.getChatId());
+        String chatId = data.getChatId();
         if (repository.isTimeBeforeNextAvailable(chatId, LocalDateTime.now())) {
             LocalDateTime nextAvailableTime = repository.getByChatId(chatId).nextAvailableTime;
-            return new AccessDeniedResponse(data.getChatId(), String.format("Анкета недоступна. Подождите до %s", nextAvailableTime));
+            return new AccessDeniedResponse(chatId, String.format("Анкета недоступна. Подождите до %s", nextAvailableTime));
         } else {
             repository.saveActivationTime(chatId, time);
-            return new SendMessage(data.getChatId(), "Время успешно изменилось");
+            return new SendMessage(chatId, "Время успешно изменилось");
         }
     }
 

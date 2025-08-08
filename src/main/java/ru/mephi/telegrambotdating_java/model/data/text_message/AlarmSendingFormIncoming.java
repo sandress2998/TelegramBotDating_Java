@@ -33,7 +33,7 @@ public class AlarmSendingFormIncoming extends AbstractInput {
         }
         try {
             repository.updateAlarmSendingForm(
-                UUID.fromString(data.getChatId()),
+                data.getChatId(),
                 receiverTag,
                 deactivationCode != null ? Integer.parseInt(deactivationCode) : null,
                 address,

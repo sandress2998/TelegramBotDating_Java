@@ -19,6 +19,7 @@ import ru.mephi.telegrambotdating_java.model.data.text_message.AuthorizationData
 import ru.mephi.telegrambotdating_java.model.data.text_message.DeactivationCodeIncoming;
 import ru.mephi.telegrambotdating_java.model.service.TelegramBotService;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -90,7 +91,7 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     private Boolean authorize(AuthorizationDataIncoming input) {
         UUID code = input.code;
 
-        AuthorizationCode authData = authorizationCodeRepository.getByCode(code);
+        AuthorizationCode authData = authorizationCodeRepository.getByCodeAndExpiresAtAfter(code, LocalDateTime.now());
         if (authData != null) {
             authorizationCodeRepository.deleteByCode(code);
             input.clientId = authData.clientId;

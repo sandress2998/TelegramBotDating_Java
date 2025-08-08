@@ -57,6 +57,7 @@ public class ActivityButtonChat {
     public AlarmToSend convertToAlarmToSend() {
         String data = "Адрес - " + address + "; Время встречи - " + datingTime;
         return new AlarmToSend(
+                chatId,
                 "@" + receiverTag,
                 "Привет! Это " + name + ". Пишу, потому что пошла на свидание и поставила таймер.\n" +
                         "Если ты читаешь это, значит, я его не выключила и возможно что-то случилось.\n" +

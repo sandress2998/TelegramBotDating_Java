@@ -19,7 +19,7 @@ public class DeactivationCodeIncoming extends AbstractInput {
 
     @Override
     public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
-        UUID chatId = UUID.fromString(data.getChatId());
+        String chatId = data.getChatId();
 
         if (repository == null) {
             return new InternalErrorResponse(data.getChatId(), "Repository is null");
@@ -27,7 +27,7 @@ public class DeactivationCodeIncoming extends AbstractInput {
 
         if (!repository.isDeactivationCodeValid(chatId, deactivationCode)) {
             if (repository.isCountdownActive(chatId)) {
-                repository.saveActivationTime(UUID.fromString(data.getChatId()), LocalDateTime.now()); // изменяем время отправки alarms на СЕЙЧАС
+                repository.saveActivationTime(chatId, LocalDateTime.now()); // изменяем время отправки alarms на СЕЙЧАС
                 repository.resetCountdownData(chatId, LocalDateTime.now().plusDays(1)); // изменяем время для следующей доступной таблицы
                 return new SendMessage(data.getChatId(), "Деактивировано");
             } else {

@@ -16,7 +16,7 @@ public class FormFillingButton extends AbstractInput {
             return new InternalErrorResponse(data.getChatId(), "Repository is null");
         }
 
-        ActivityButtonChat currentForm = repository.getByChatId(UUID.fromString(data.getChatId()));
+        ActivityButtonChat currentForm = repository.getByChatId(data.getChatId());
         return new SendMessage(data.getChatId(), String.format("""
                         Текущая анкета:
                         Код деактивации: XXXX\s
