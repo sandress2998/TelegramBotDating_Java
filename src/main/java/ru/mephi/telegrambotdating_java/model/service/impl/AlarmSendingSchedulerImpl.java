@@ -13,7 +13,6 @@ import ru.mephi.telegrambotdating_java.database.entity.AlarmToSend;
 import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 import ru.mephi.telegrambotdating_java.database.repository.AlarmToSendRepository;
 import ru.mephi.telegrambotdating_java.model.service.AlarmSendingScheduler;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +36,12 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
         List<ActivityButtonChat> row = activityButtonRepository.getActivityButtonChatByActivationTimeIsAfter(LocalDateTime.now());
 
         List<AlarmToSend> alarms = convertToAlarms(row);
+        if (alarms == null) return;
 
         // 2. сохраняем в другую таблицу (откуда отдельный процесс/поток и будет читать), которую тоже надо периодически очищать. Своеобразный Outbox
-        alarmToSendRepository.saveAll(alarms);
+        alarms.forEach(alarm -> {
+            alarmToSendRepository.save(alarm);
+        });
 
         // 3. Подчищаем данные о полученных анкетах, ставим следующую доступную анкету через сутки
         row.forEach(it -> {
@@ -57,7 +59,7 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
     @Override
     public void sendAlarms() {
         // извлекаем все alarms, которые необходимо отправить.
-        List<AlarmToSend> alarms = alarmToSendRepository.getAll();
+        Iterable<AlarmToSend> alarms = alarmToSendRepository.findAll();
 
         alarms.forEach(alarm -> {
             try {

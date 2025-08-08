@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.UUID;
 
-@Entity
+@Entity(name = "alarm_to_send")
 public class AlarmToSend {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

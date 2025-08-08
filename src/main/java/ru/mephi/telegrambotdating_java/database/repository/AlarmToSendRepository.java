@@ -6,7 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.mephi.telegrambotdating_java.database.entity.AlarmToSend;
-import ru.mephi.telegrambotdating_java.database.entity.AuthorizationCode;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,8 +30,4 @@ public interface AlarmToSendRepository extends CrudRepository<AlarmToSend, UUID>
             nativeQuery = true
     )
     void decrementAndCleanup(@Param("id") UUID id);
-
-    public void saveAll(List<AlarmToSend> alarms);
-
-    public List<AlarmToSend> getAll();
 }

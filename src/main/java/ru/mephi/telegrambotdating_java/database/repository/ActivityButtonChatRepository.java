@@ -1,10 +1,8 @@
 package ru.mephi.telegrambotdating_java.database.repository;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.mephi.telegrambotdating_java.database.entity.ActivityButtonChat;
 
@@ -49,10 +47,6 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
     void resetCountdownData(String chatId, LocalDateTime nextAvailableTime);
 
     List<ActivityButtonChat> getActivityButtonChatByActivationTimeIsAfter(LocalDateTime activationTime);
-
-    @Modifying
-    @Query("DELETE FROM AlarmToSend a WHERE a.id IN :ids")
-    void deleteAllByIds(@Param("ids") List<UUID> ids);
 
     void deleteByClientId(UUID clientId);
 }

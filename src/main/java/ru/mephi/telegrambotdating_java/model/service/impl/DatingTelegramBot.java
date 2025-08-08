@@ -1,5 +1,6 @@
 package ru.mephi.telegrambotdating_java.model.service.impl;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -19,8 +20,8 @@ public class DatingTelegramBot extends TelegramLongPollingBot {
             @Value("${telegram.bot.username}") String botUsername,
             TelegramBotService telegramBotService
     ) {
-        super(System.getenv("TELEGRAM_TOKEN"));
-        this.botToken = System.getenv("TELEGRAM_TOKEN");
+        super(Dotenv.load().get("TELEGRAM_TOKEN"));
+        this.botToken = Dotenv.load().get("TELEGRAM_TOKEN");
         this.botUsername = botUsername;
         this.telegramBotService = telegramBotService;
     }
@@ -34,12 +35,12 @@ public class DatingTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             SendMessage response = telegramBotService.handleIncomingInfo(
-                    new SpareMessageData(
-                            String.valueOf(update.getMessage().getChatId()),
-                            update.getMessage().getText(),
-                            (long) update.getMessage().getMessageId(),
-                            this
-                    )
+                new SpareMessageData(
+                        String.valueOf(update.getMessage().getChatId()),
+                        update.getMessage().getText(),
+                        (long) update.getMessage().getMessageId(),
+                        this
+                )
             );
 
             try {
