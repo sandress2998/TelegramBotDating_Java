@@ -53,4 +53,6 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
     @Modifying
     @Query("DELETE FROM AlarmToSend a WHERE a.id IN :ids")
     void deleteAllByIds(@Param("ids") List<UUID> ids);
+
+    void deleteByClientId(UUID clientId);
 }

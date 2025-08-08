@@ -1,7 +1,7 @@
 package ru.mephi.telegrambotdating_java.database.entity;
 
 import jakarta.persistence.*;
-import ru.mephi.telegrambotdating_java.model.data.text_message.AlarmSendingForm;
+import ru.mephi.telegrambotdating_java.model.data.text_message.AlarmSendingFormIncoming;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +13,7 @@ public class ActivityButtonChat {
     public UUID id;
 
     @Column(name = "chat_id", unique = true)
-    public UUID chatId;
+    public String chatId;
 
     @Column(name = "client_id", unique = true)
     public UUID clientId;
@@ -44,13 +44,14 @@ public class ActivityButtonChat {
 
     public ActivityButtonChat() {}
 
-    public ActivityButtonChat(UUID chatId, UUID clientId, String name) {
+    public ActivityButtonChat(String chatId, UUID clientId, String name) {
         this.chatId = chatId;
         this.clientId = clientId;
+        this.name = name;
     }
 
-    public AlarmSendingForm convertToAlarmSendingForm() {
-        return new AlarmSendingForm(receiverTag, deactivationCode != null ? deactivationCode.toString() : null, address, datingTime != null ? datingTime.toString() : null);
+    public AlarmSendingFormIncoming convertToAlarmSendingForm() {
+        return new AlarmSendingFormIncoming(receiverTag, deactivationCode != null ? deactivationCode.toString() : null, address, datingTime != null ? datingTime.toString() : null);
     }
 
     public AlarmToSend convertToAlarmToSend() {

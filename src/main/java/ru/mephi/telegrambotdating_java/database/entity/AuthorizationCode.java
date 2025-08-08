@@ -15,7 +15,7 @@ public class AuthorizationCode {
     public UUID code;
 
     @Column(name = "client_id", unique = true, nullable = false)
-    public String clientId;
+    public UUID clientId;
 
     @Column(name = "expires_at", nullable = false)
     public LocalDateTime expiresAt;

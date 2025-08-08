@@ -5,6 +5,7 @@ import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRep
 import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
+import ru.mephi.telegrambotdating_java.model.data.bad_request.InvalidDataInput;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,6 +36,18 @@ public class DeactivationCodeIncoming extends AbstractInput {
         } else {
             repository.resetCountdownData(chatId, LocalDateTime.now().plusDays(1));
             return new SendMessage(data.getChatId(), "Деактивировано");
+        }
+    }
+
+    static public AbstractInput tryParse(String text) {
+        try {
+            int code = Integer.parseInt(text);
+            if (code >= 1000 && code <= 9999) {
+                return new DeactivationCodeIncoming(code);
+            }
+            return new InvalidDataInput("Нужно ввести четырехзначное число");
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

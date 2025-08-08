@@ -36,7 +36,7 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
         // 1. Получаем анкеты, которые нужно отправить
         List<ActivityButtonChat> row = activityButtonRepository.getActivityButtonChatByActivationTimeIsAfter(LocalDateTime.now());
 
-        List<AlarmToSend> alarms = toAlarms(row);
+        List<AlarmToSend> alarms = convertToAlarms(row);
 
         // 2. сохраняем в другую таблицу (откуда отдельный процесс/поток и будет читать), которую тоже надо периодически очищать. Своеобразный Outbox
         alarmToSendRepository.saveAll(alarms);
@@ -68,7 +68,7 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
         });
     }
 
-    List<AlarmToSend> toAlarms(List<ActivityButtonChat> row) {
+    private List<AlarmToSend> convertToAlarms(List<ActivityButtonChat> row) {
         if (row.isEmpty()) return null;
 
         List<AlarmToSend> alarms = new ArrayList<>();

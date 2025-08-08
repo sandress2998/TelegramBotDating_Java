@@ -8,16 +8,18 @@ import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorRespo
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
-public class AlarmSendingForm extends AbstractInput {
+public class AlarmSendingFormIncoming extends AbstractInput {
     final String receiverTag;
     final String deactivationCode;
     final String address;
     final String time;
     LocalDateTime datingTime;
 
-    public AlarmSendingForm(String receiverTag, String deactivationCode, String address, String time) {
+    public AlarmSendingFormIncoming(String receiverTag, String deactivationCode, String address, String time) {
         this.receiverTag = receiverTag;
         this.deactivationCode = deactivationCode;
         this.address = address;
@@ -41,6 +43,18 @@ public class AlarmSendingForm extends AbstractInput {
         } catch (Exception e) {
             return new InternalErrorResponse(data.getChatId(), "Internal server error");
         }
+    }
+
+    static public AbstractInput tryParse(String text) {
+        List<String> lines = Arrays.stream(text.split("\n"))
+                .map(String::trim)
+                .filter(line -> !line.isEmpty())
+                .toList();
+        if (lines.size() != 4) {
+            return null;
+        }
+        AlarmSendingFormIncoming alarmSendingFormIncoming = new AlarmSendingFormIncoming(lines.get(0), lines.get(1), lines.get(2), lines.get(3));
+        return alarmSendingFormIncoming.isDataCorrect() ? alarmSendingFormIncoming : null;
     }
 
     public boolean isDataCorrect() {

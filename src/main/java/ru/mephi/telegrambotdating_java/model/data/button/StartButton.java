@@ -15,7 +15,9 @@ public class StartButton extends AbstractInput {
     public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
         SendMessage message = new SendMessage(data.getChatId(), "Привет! Я помогу обеспечить твою безопасность.\n" +
                 "Для лучшего понимания работы бота нажмите на кнопку *Информация*\n" +
-                "Следующим сообщением введите временный код доступа, который Вы сгенерировали в приложении");
+                "Следующим сообщением введите временный код доступа, который Вы сгенерировали в приложении и " +
+                "фамилию и имя в следующей строке. К примеру:\n" +
+                "5b310ba4-23e0-488f-8293-93ec696bd1d9\n" + "Ваня Пупкин");
 
         ReplyKeyboardMarkup replyMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();
