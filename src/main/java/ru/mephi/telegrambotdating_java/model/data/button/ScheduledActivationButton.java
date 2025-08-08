@@ -6,8 +6,6 @@ import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
 
-import javax.swing.*;
-
 public class ScheduledActivationButton extends AbstractInput {
 
     @Override

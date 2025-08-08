@@ -17,15 +17,16 @@ public class FormFillingButton extends AbstractInput {
         }
 
         ActivityButtonChat currentForm = repository.getByChatId(UUID.fromString(data.getChatId()));
-        return new SendMessage(data.getChatId(), String.format("Текущая анкета:\n" +
-                        "Код деактивации: XXXX \n" +
-                        "Адрес: %s\n" +
-                        "Время встречи: %s\n" +
-                        "\n" +
-                        "Для редактирования анкеты введите данные в формате: \n" +
-                        "<код деактивации (4 цифры)> ENTER\n" +
-                        "<адрес (не более 200 символов)> ENTER\n" +
-                        "<время встречи (к примеру, 18.09.2025 23:09)>",
+        return new SendMessage(data.getChatId(), String.format("""
+                        Текущая анкета:
+                        Код деактивации: XXXX\s
+                        Адрес: %s
+                        Время встречи: %s
+
+                        Для редактирования анкеты введите данные в формате:\s
+                        <код деактивации (4 цифры)> ENTER
+                        <адрес (не более 200 символов)> ENTER
+                        <время встречи (к примеру, 18.09.2025 23:09)>""",
                 currentForm != null ? currentForm.address : "N/A",
                 currentForm != null ? currentForm.datingTime : "N/A"));
     }

@@ -17,7 +17,7 @@ public interface TelegramBotRepository extends CrudRepository<ActivityButtonChat
 
     @Modifying
     @Query(value = "UPDATE activity_button_chat a SET a.isCountdownActive = :isActive WHERE a.chatId = :chatId")
-    int updateCountdownStatus(UUID chatId, boolean isActive);
+    void updateCountdownStatus(UUID chatId, boolean isActive);
 
     @Modifying
     @Query(value = "UPDATE activity_button_chat SET activation_time = :activationTime WHERE chat_id = :chatId", nativeQuery = true)

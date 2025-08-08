@@ -49,10 +49,7 @@ public class AlarmSendingForm extends AbstractInput {
 
     public boolean isDeactivationCodeCorrect() {
         try {
-            if (deactivationCode == null || (Integer.parseInt(deactivationCode) >= 1000 && Integer.parseInt(deactivationCode) <= 9999)) {
-                return true;
-            }
-            return false;
+            return deactivationCode == null || (Integer.parseInt(deactivationCode) >= 1000 && Integer.parseInt(deactivationCode) <= 9999);
         } catch (NumberFormatException e) {
             return false;
         }

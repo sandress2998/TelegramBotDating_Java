@@ -21,7 +21,7 @@ public class DeactivationCodeIncoming extends AbstractInput {
 
     @Override
     public SendMessage handle(SpareMessageData data, TelegramBotRepository repository) {
-        UUID chatId = UUID.fromString(data.getChatId().toString());
+        UUID chatId = UUID.fromString(data.getChatId());
 
         if (repository == null) {
             return new InternalErrorResponse(data.getChatId(), "Repository is null");
