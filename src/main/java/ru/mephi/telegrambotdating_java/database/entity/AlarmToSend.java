@@ -7,7 +7,7 @@ import java.util.UUID;
 @Entity(name = "alarm_to_send")
 public class AlarmToSend {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.AUTO)
     public UUID id;
 
     @Column(name = "chat_id", unique = true, nullable = false)

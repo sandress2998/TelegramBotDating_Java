@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 public class InternalErrorResponse extends SendMessage {
     public InternalErrorResponse(String chatId, String message) {
-        new SendMessage(chatId, "Внутренняя ошибка: " + message);
+        super.setChatId(chatId);
+        super.setText("Внутренняя ошибка: " + message);
     }
 }

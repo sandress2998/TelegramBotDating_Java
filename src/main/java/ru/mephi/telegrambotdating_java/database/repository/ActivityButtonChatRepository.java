@@ -1,8 +1,9 @@
 package ru.mephi.telegrambotdating_java.database.repository;
 
-import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.mephi.telegrambotdating_java.database.entity.ActivityButtonChat;
 
@@ -15,6 +16,8 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
 
     ActivityButtonChat getByChatId(String chatId);
 
+    ActivityButtonChat getByClientId(UUID clientId);
+
     @Modifying
     @Query(value = "UPDATE activity_button_chat a SET a.isCountdownActive = :isActive WHERE a.chatId = :chatId")
     void updateCountdownStatus(String chatId, boolean isActive);
@@ -23,16 +26,23 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
     @Query(value = "UPDATE activity_button_chat SET activation_time = :activationTime WHERE chat_id = :chatId", nativeQuery = true)
     void saveActivationTime(String chatId, LocalDateTime activationTime);
 
-    @Query(value = "SELECT CASE WHEN :currentTime < a.nextAvailableTime THEN true ELSE false END FROM activity_button_chat a WHERE a.chatId = :chatId")
+    @Query(value = "SELECT CASE WHEN :currentTime > a.nextAvailableTime THEN true ELSE false END FROM activity_button_chat a WHERE a.chatId = :chatId")
     boolean isTimeBeforeNextAvailable(String chatId, LocalDateTime currentTime);
 
     @Modifying
-    @Query(value = "UPDATE activity_button_chat a SET a.deactivationCode = CASE WHEN :deactivationCode IS NOT NULL" +
-            " THEN :deactivationCode ELSE a.deactivationCode END, a.receiverTag = CASE WHEN :receiverTag IS NOT NULL" +
-            " THEN :receiverTag ELSE a.receiverTag END, a.address = CASE WHEN :address IS NOT NULL" +
-            " THEN :address ELSE a.address END, a.datingTime = CASE WHEN :datingTime IS NOT NULL" +
-            " THEN :datingTime ELSE a.datingTime END WHERE a.chatId = :chatId")
-    void updateAlarmSendingForm(String chatId, String receiverTag, Integer deactivationCode, String address, LocalDateTime datingTime);
+    @Query("UPDATE activity_button_chat a SET " +
+            "a.receiverTag = COALESCE(:receiverTag, a.receiverTag), " +
+            "a.deactivationCode = COALESCE(:deactivationCode, a.deactivationCode), " +
+            "a.address = COALESCE(:address, a.address), " +
+            "a.datingTime = COALESCE(:datingTime, a.datingTime) " +
+            "WHERE a.chatId = :chatId")
+    void updateAlarmSendingForm(
+            @Param("chatId") String chatId,
+            @Param("receiverTag") String receiverTag,
+            @Param("deactivationCode") Integer deactivationCode,
+            @Param("address") String address,
+            @Param("datingTime") LocalDateTime datingTime
+    );
 
     @Query(value = "SELECT CASE WHEN deactivation_code = :deactivationCode THEN true ELSE false END FROM activity_button_chat WHERE chat_id = :chatId", nativeQuery = true)
     boolean isDeactivationCodeValid(String chatId, int deactivationCode);
@@ -46,7 +56,14 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
             " next_available = :nextAvailableTime WHERE chat_id = :chatId", nativeQuery = true)
     void resetCountdownData(String chatId, LocalDateTime nextAvailableTime);
 
-    List<ActivityButtonChat> getActivityButtonChatByActivationTimeIsAfter(LocalDateTime activationTime);
+    List<ActivityButtonChat> getByActivationTimeIsBefore(LocalDateTime activationTime);
 
     void deleteByClientId(UUID clientId);
+
+    void deleteByChatId(String chatId);
+
+    // Метод для тестирования
+    @Modifying
+    @Query("UPDATE activity_button_chat a SET a.nextAvailableTime = :nextAvailableTime WHERE a.chatId = :chatId")
+    void setNextAvailableTime(String chatId, LocalDateTime nextAvailableTime);
 }

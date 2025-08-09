@@ -32,16 +32,16 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
     @Scheduled(fixedRate = 60000)  // 60 000 мс = 1 минута
     @Transactional
     public void addToQueueAndClean() {
+        System.out.println("Пытаемся извлечь нужные анкеты и поместить их в таблицу, откуда другой процесс должен их отправить");
+
         // 1. Получаем анкеты, которые нужно отправить
-        List<ActivityButtonChat> row = activityButtonRepository.getActivityButtonChatByActivationTimeIsAfter(LocalDateTime.now());
+        List<ActivityButtonChat> row = activityButtonRepository.getByActivationTimeIsBefore(LocalDateTime.now());
 
         List<AlarmToSend> alarms = convertToAlarms(row);
         if (alarms == null) return;
 
         // 2. сохраняем в другую таблицу (откуда отдельный процесс/поток и будет читать), которую тоже надо периодически очищать. Своеобразный Outbox
-        alarms.forEach(alarm -> {
-            alarmToSendRepository.save(alarm);
-        });
+        alarmToSendRepository.saveAll(alarms);
 
         // 3. Подчищаем данные о полученных анкетах, ставим следующую доступную анкету через сутки
         row.forEach(it -> {

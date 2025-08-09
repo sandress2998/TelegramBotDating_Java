@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
+import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
 import ru.mephi.telegrambotdating_java.model.service.TelegramBotService;
 
 @Component
@@ -33,20 +34,28 @@ public class DatingTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
+        if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getChatId() != null) {
             SendMessage response = telegramBotService.handleIncomingInfo(
                 new SpareMessageData(
-                        String.valueOf(update.getMessage().getChatId()),
-                        update.getMessage().getText(),
-                        (long) update.getMessage().getMessageId(),
-                        this
+                    String.valueOf(update.getMessage().getChatId()),
+                    update.getMessage().getText(),
+                    (long) update.getMessage().getMessageId(),
+                    this
                 )
             );
 
+            if (response == null) {
+                response = new InternalErrorResponse(update.getMessage().getChatId().toString(), "Что-то пошло не так...");
+            }
+
             try {
+                System.out.println("Номер чата" + response.getChatId());
                 execute(response);
             } catch (TelegramApiException e) {
                 // должно быть логирование
+                e.printStackTrace();
+            } catch (Exception e) {
+                // тоже какое-то доп действие
                 e.printStackTrace();
             }
         }

@@ -1,5 +1,6 @@
 package ru.mephi.telegrambotdating_java.model.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,10 @@ public class AuthorizationSchedulerImpl implements AuthorizationScheduler {
 
     // раз в 5 минут
     @Scheduled(fixedRate = 60000 * 5)
+    @Transactional
     @Override
     public void deleteExpiredCodes() {
+        System.out.println("Deleting expired codes...");
         repository.deleteAllByExpiresAtBefore(LocalDateTime.now());
     }
 }

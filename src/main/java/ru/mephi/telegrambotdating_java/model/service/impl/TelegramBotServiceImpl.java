@@ -51,45 +51,49 @@ public class TelegramBotServiceImpl implements TelegramBotService {
     private AbstractInput trySpecialParse(SpareMessageData data) {
         AbstractInput input;
         String text = data.getText();
+        System.out.println("Получили текст");
 
         input = ActivationTimeIncoming.tryParse(text);
         if (input != null) {
+            System.out.println("Ставим время активации");
             return input;
         }
 
         input = AlarmSendingFormIncoming.tryParse(text);
         if (input != null) {
-            return input;
-        }
-
-        input = AuthorizationDataIncoming.tryParse(text);
-        if (input != null) {
+            System.out.println("Заполняем анкету");
             return input;
         }
 
         input = DeactivationCodeIncoming.tryParse(text);
         if (input != null) {
+            System.out.println("Получили код деактивации");
             return input;
         }
 
         // проблема образовалась с авторизацией
         input = AuthorizationDataIncoming.tryParse(text);
         if (input instanceof AuthorizationDataIncoming) {
+            System.out.println("Пытаемся авторизоваться");
             if (authorize((AuthorizationDataIncoming) input)) {
+                System.out.println("Авторизовались");
                 // если данные были введены верно
                 return input;
             } else {
+                System.out.println("Неправильные данные авторизации");
                 // если данные были введены неверно (формат верный, но такого кода авторизации не существует)
                 return new InvalidDataInput("Неправильные данные авторизации");
             }
         }
 
+        System.out.println("Неизвестная команда (неудачный парсинг)");
         return new UnknownInput();
     }
 
     private Boolean authorize(AuthorizationDataIncoming input) {
         UUID code = input.code;
 
+        // authData будет не null только в том случае, если code не просрочен и совпадает
         AuthorizationCode authData = authorizationCodeRepository.getByCodeAndExpiresAtAfter(code, LocalDateTime.now());
         if (authData != null) {
             authorizationCodeRepository.deleteByCode(code);

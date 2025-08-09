@@ -1,8 +1,6 @@
 package ru.mephi.telegrambotdating_java.database.entity;
 
 import jakarta.persistence.*;
-import ru.mephi.telegrambotdating_java.model.data.text_message.AlarmSendingFormIncoming;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -50,15 +48,11 @@ public class ActivityButtonChat {
         this.name = name;
     }
 
-    public AlarmSendingFormIncoming convertToAlarmSendingForm() {
-        return new AlarmSendingFormIncoming(receiverTag, deactivationCode != null ? deactivationCode.toString() : null, address, datingTime != null ? datingTime.toString() : null);
-    }
-
     public AlarmToSend convertToAlarmToSend() {
         String data = "Адрес - " + address + "; Время встречи - " + datingTime;
         return new AlarmToSend(
                 chatId,
-                "@" + receiverTag,
+                "@a" + receiverTag,
                 "Привет! Это " + name + ". Пишу, потому что пошла на свидание и поставила таймер.\n" +
                         "Если ты читаешь это, значит, я его не выключила и возможно что-то случилось.\n" +
                         "Вот данные о моем местоположении: " + data

@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.mephi.telegrambotdating_java.database.entity.AlarmToSend;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository

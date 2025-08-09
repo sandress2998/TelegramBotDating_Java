@@ -8,7 +8,6 @@ import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorRespo
 import ru.mephi.telegrambotdating_java.model.data.bad_request.InvalidDataInput;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class DeactivationCodeIncoming extends AbstractInput {
     private final int deactivationCode;
@@ -25,18 +24,24 @@ public class DeactivationCodeIncoming extends AbstractInput {
             return new InternalErrorResponse(data.getChatId(), "Repository is null");
         }
 
-        if (!repository.isDeactivationCodeValid(chatId, deactivationCode)) {
-            if (repository.isCountdownActive(chatId)) {
-                repository.saveActivationTime(chatId, LocalDateTime.now()); // изменяем время отправки alarms на СЕЙЧАС
-                repository.resetCountdownData(chatId, LocalDateTime.now().plusDays(1)); // изменяем время для следующей доступной таблицы
-                return new SendMessage(data.getChatId(), "Деактивировано");
+        try {
+            if (!repository.isDeactivationCodeValid(chatId, deactivationCode)) {
+                if (repository.isCountdownActive(chatId)) {
+                    repository.saveActivationTime(chatId, LocalDateTime.now()); // изменяем время отправки alarms на СЕЙЧАС
+                    repository.resetCountdownData(chatId, LocalDateTime.now().plusDays(1)); // изменяем время для следующей доступной таблицы
+                    return new SendMessage(data.getChatId(), "Деактивировано");
+                } else {
+                    return new SendMessage(data.getChatId(), "Неверный код деактивации");
+                }
             } else {
-                return new SendMessage(data.getChatId(), "Неверный код деактивации");
+                repository.resetCountdownData(chatId, LocalDateTime.now().plusDays(1));
+                return new SendMessage(data.getChatId(), "Деактивировано");
             }
-        } else {
-            repository.resetCountdownData(chatId, LocalDateTime.now().plusDays(1));
-            return new SendMessage(data.getChatId(), "Деактивировано");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new InternalErrorResponse(chatId, "Internal Server Error");
         }
+
     }
 
     static public AbstractInput tryParse(String text) {

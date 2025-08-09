@@ -19,14 +19,17 @@ public class FormFillingButton extends AbstractInput {
         ActivityButtonChat currentForm = repository.getByChatId(data.getChatId());
         return new SendMessage(data.getChatId(), String.format("""
                         Текущая анкета:
+                        Получатель: %s
                         Код деактивации: XXXX\s
                         Адрес: %s
                         Время встречи: %s
 
                         Для редактирования анкеты введите данные в формате:\s
-                        <код деактивации (4 цифры)> ENTER
-                        <адрес (не более 200 символов)> ENTER
-                        <время встречи (к примеру, 18.09.2025 23:09)>""",
+                        - <тэг получателя (без @)> ENTER
+                        - <код деактивации (4 цифры)> ENTER
+                        - <адрес (не более 200 символов)> ENTER
+                        - <время встречи (к примеру, 18.09.2025 23:09)>""",
+                currentForm != null ? currentForm.receiverTag : "N/A",
                 currentForm != null ? currentForm.address : "N/A",
                 currentForm != null ? currentForm.datingTime : "N/A"));
     }

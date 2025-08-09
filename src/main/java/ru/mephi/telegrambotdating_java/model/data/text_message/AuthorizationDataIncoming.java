@@ -30,13 +30,25 @@ public class AuthorizationDataIncoming extends AbstractInput {
     public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
         if (name == null || clientId == null)
             return new InternalErrorResponse(data.getChatId(), "Something went wrong");
-        repository.deleteByClientId(clientId);
-        ActivityButtonChat activityButtonChat = new ActivityButtonChat(
-                data.getChatId(),
-                clientId,
-                name
-        );
-        repository.save(activityButtonChat);
+
+        // проверяем, есть ли пользователь с уже существующим chatId/clientId
+        ActivityButtonChat existing = repository.getByChatId(data.getChatId());
+        if (existing == null) {
+            existing = repository.getByClientId(clientId);
+        }
+
+        if (existing != null) {
+            System.out.println("Уже существует запись");
+            // Обновляем существующую запись
+            existing.clientId = clientId;
+            existing.name = name;
+        } else {
+            // Создаём новую
+            System.out.println("Создаем новую запись");
+            existing = new ActivityButtonChat(data.getChatId(), clientId, name);
+        }
+        repository.save(existing);
+
         return new SendMessage(data.getChatId(), "Вы успешно авторизовались!");
     }
 

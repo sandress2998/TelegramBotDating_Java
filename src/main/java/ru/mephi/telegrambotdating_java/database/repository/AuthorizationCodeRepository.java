@@ -9,9 +9,9 @@ import java.util.UUID;
 
 @Repository
 public interface AuthorizationCodeRepository extends CrudRepository<AuthorizationCode, UUID> {
-    public AuthorizationCode getByCodeAndExpiresAtAfter(UUID code, LocalDateTime expiresAt);
+    AuthorizationCode getByCodeAndExpiresAtAfter(UUID code, LocalDateTime expiresAt);
 
-    public void deleteByCode(UUID code);
+    void deleteByCode(UUID code);
 
-    public void deleteAllByExpiresAtBefore(LocalDateTime expiresAt);
+    void deleteAllByExpiresAtBefore(LocalDateTime expiresAt);
 }
