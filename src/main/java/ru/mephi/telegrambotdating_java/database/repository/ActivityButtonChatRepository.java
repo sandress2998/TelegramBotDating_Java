@@ -18,6 +18,8 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
 
     ActivityButtonChat getByClientId(UUID clientId);
 
+    List<ActivityButtonChat> getByCountdownActiveAndActivationTimeIsBefore(boolean isCountdownActive, LocalDateTime activationTime);
+
     @Modifying
     @Query(value = "UPDATE activity_button_chat a SET a.isCountdownActive = :isActive WHERE a.chatId = :chatId")
     void updateCountdownStatus(String chatId, boolean isActive);
@@ -57,10 +59,6 @@ public interface ActivityButtonChatRepository extends CrudRepository<ActivityBut
     void resetCountdownData(String chatId, LocalDateTime nextAvailableTime);
 
     List<ActivityButtonChat> getByActivationTimeIsBefore(LocalDateTime activationTime);
-
-    void deleteByClientId(UUID clientId);
-
-    void deleteByChatId(String chatId);
 
     // Метод для тестирования
     @Modifying

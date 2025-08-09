@@ -2,104 +2,81 @@ package ru.mephi.telegrambotdating_java.model.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.mephi.telegrambotdating_java.database.entity.AuthorizationCode;
-import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
-import ru.mephi.telegrambotdating_java.database.repository.AuthorizationCodeRepository;
-import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
+import ru.mephi.telegrambotdating_java.model.data.response.InternalErrorResponse;
+import ru.mephi.telegrambotdating_java.model.handler.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
-import ru.mephi.telegrambotdating_java.model.data.bad_request.InvalidDataInput;
-import ru.mephi.telegrambotdating_java.model.data.bad_request.UnknownInput;
-import ru.mephi.telegrambotdating_java.model.data.button.*;
-import ru.mephi.telegrambotdating_java.model.data.text_message.ActivationTimeIncoming;
-import ru.mephi.telegrambotdating_java.model.data.text_message.AlarmSendingFormIncoming;
-import ru.mephi.telegrambotdating_java.model.data.text_message.AuthorizationDataIncoming;
-import ru.mephi.telegrambotdating_java.model.data.text_message.DeactivationCodeIncoming;
+import ru.mephi.telegrambotdating_java.model.handler.UnknownInput;
+import ru.mephi.telegrambotdating_java.model.handler.button.*;
+import ru.mephi.telegrambotdating_java.model.handler.text_message.ActivationTimeIncoming;
+import ru.mephi.telegrambotdating_java.model.handler.text_message.AlarmSendingFormIncoming;
+import ru.mephi.telegrambotdating_java.model.handler.text_message.AuthorizationDataIncoming;
+import ru.mephi.telegrambotdating_java.model.handler.text_message.DeactivationCodeIncoming;
 import ru.mephi.telegrambotdating_java.model.service.TelegramBotService;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class TelegramBotServiceImpl implements TelegramBotService {
-    @Autowired
-    private ActivityButtonChatRepository activityButtonChatRepository;
 
+    // обработчики для кнопок
     @Autowired
-    private AuthorizationCodeRepository authorizationCodeRepository;
+    EmergencyActivationButton emergencyActivationButton;
+    @Autowired
+    FormFillingButton formFillingButton;
+    @Autowired
+    InformationButton informationButton;
+    @Autowired
+    ScheduledActivationButton scheduledActivationButton;
+    @Autowired
+    StartButton sendButton;
 
-    @Transactional
+    // обработчики для текста
+    @Autowired
+    ActivationTimeIncoming activationTimeIncoming;
+    @Autowired
+    AlarmSendingFormIncoming alarmSendingFormIncoming;
+    @Autowired
+    AuthorizationDataIncoming authorizationDataIncoming;
+    @Autowired
+    DeactivationCodeIncoming deactivationCodeIncoming;
+
     @Override
     public SendMessage handleIncomingInfo(SpareMessageData data) {
-        /* Пришлось потанцевать с бубном из-за того, что передавать репозиторий в handle -
-         * оказалось не лучшим решением, особенно учитывая тот факт, что сигнатура
-         * метода handle везде одинаковая. Все же со Spring оказалось труднее реализовать
-         * богатую модель, а не анемичную.
+        /* Раньше я пыталась передавать репозитории в handle явно, но
+         * Spring к этому, видимо, не приспособлен, поэтому я просто сделала
+         *  обработчики сервисами. Богатая модель, видимо, не для Spring.
          */
-        AbstractInput command = switch (data.getText()) {
-            case "/start" -> new StartButton();
-            case "Анкета" -> new FormFillingButton();
-            case "Информация" -> new InformationButton();
-            case "Экстренная активация" -> new EmergencyActivationButton();
-            case "Настроить время активации" -> new ScheduledActivationButton();
-            default -> trySpecialParse(data);
-        };
-        return command.handle(data, activityButtonChatRepository);
+        AbstractInput input = tryButtonParse(data.getText());
+        if (input == null) {
+            input = tryTextParse(data.getText());
+        }
+
+        try {
+            return input.handle(data);
+        } catch (Exception e) {
+            return new InternalErrorResponse(data.getChatId(), "Что-то пошло не так...");
+        }
     }
 
-    private AbstractInput trySpecialParse(SpareMessageData data) {
-        AbstractInput input;
-        String text = data.getText();
-        System.out.println("Получили текст");
+    private AbstractInput tryButtonParse(String text) {
+        AbstractInput command = null;
 
-        input = ActivationTimeIncoming.tryParse(text);
-        if (input != null) {
-            System.out.println("Ставим время активации");
-            return input;
-        }
+        if (text.equals(emergencyActivationButton.getTitle())) command = emergencyActivationButton;
+        else if (text.equals(formFillingButton.getTitle())) command = formFillingButton;
+        else if (text.equals(informationButton.getTitle())) command = informationButton;
+        else if (text.equals(scheduledActivationButton.getTitle())) command = scheduledActivationButton;
+        else if (text.equals(sendButton.getTitle())) command = sendButton;
 
-        input = AlarmSendingFormIncoming.tryParse(text);
-        if (input != null) {
-            System.out.println("Заполняем анкету");
-            return input;
-        }
-
-        input = DeactivationCodeIncoming.tryParse(text);
-        if (input != null) {
-            System.out.println("Получили код деактивации");
-            return input;
-        }
-
-        // проблема образовалась с авторизацией
-        input = AuthorizationDataIncoming.tryParse(text);
-        if (input instanceof AuthorizationDataIncoming) {
-            System.out.println("Пытаемся авторизоваться");
-            if (authorize((AuthorizationDataIncoming) input)) {
-                System.out.println("Авторизовались");
-                // если данные были введены верно
-                return input;
-            } else {
-                System.out.println("Неправильные данные авторизации");
-                // если данные были введены неверно (формат верный, но такого кода авторизации не существует)
-                return new InvalidDataInput("Неправильные данные авторизации");
-            }
-        }
-
-        System.out.println("Неизвестная команда (неудачный парсинг)");
-        return new UnknownInput();
+        return command;
     }
 
-    private Boolean authorize(AuthorizationDataIncoming input) {
-        UUID code = input.code;
+    private AbstractInput tryTextParse(String text) {
+        AbstractInput command = null;
+        if (activationTimeIncoming.isBelongToType(text)) command = activationTimeIncoming;
+        else if (alarmSendingFormIncoming.isBelongToType(text)) command = alarmSendingFormIncoming;
+        else if (authorizationDataIncoming.isBelongToType(text)) command = authorizationDataIncoming;
+        else if (deactivationCodeIncoming.isBelongToType(text)) command = deactivationCodeIncoming;
 
-        // authData будет не null только в том случае, если code не просрочен и совпадает
-        AuthorizationCode authData = authorizationCodeRepository.getByCodeAndExpiresAtAfter(code, LocalDateTime.now());
-        if (authData != null) {
-            authorizationCodeRepository.deleteByCode(code);
-            input.clientId = authData.clientId;
-            return true;
-        }
-        return false;
+        if (command == null) command = new UnknownInput();
+        return command;
     }
 }

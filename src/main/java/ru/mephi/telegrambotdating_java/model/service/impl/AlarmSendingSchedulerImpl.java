@@ -8,6 +8,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.mephi.telegrambotdating_java.database.entity.ActivityButtonChat;
 import ru.mephi.telegrambotdating_java.database.entity.AlarmToSend;
 import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
@@ -66,8 +67,16 @@ public class AlarmSendingSchedulerImpl implements AlarmSendingScheduler {
                 Chat newChat = bot.execute(new GetChat(alarm.receiver));
                 bot.execute(new SendMessage(newChat.getId().toString(), alarm.text));
                 alarmToSendRepository.deleteById(alarm.id);
+            } catch (TelegramApiException e) {
+                if (e.getMessage().contains("Forbidden")) {
+                    // Бот заблокирован или не имеет доступа
+                    alarmToSendRepository.deleteById(alarm.id);
+                } else {
+                    alarmToSendRepository.decrementAndCleanup(alarm.id);
+                }
             } catch (Exception e) {
-                alarmToSendRepository.decrementAndCleanup(alarm.id);
+                // здесь должно быть какое-то логгирование
+                e.printStackTrace();
             }
         });
     }

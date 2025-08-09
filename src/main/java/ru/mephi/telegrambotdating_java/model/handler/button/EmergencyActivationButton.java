@@ -1,26 +1,31 @@
-package ru.mephi.telegrambotdating_java.model.data.button;
+package ru.mephi.telegrambotdating_java.model.handler.button;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
+import ru.mephi.telegrambotdating_java.model.handler.AbstractButtonInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
-import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
+import ru.mephi.telegrambotdating_java.model.data.response.InternalErrorResponse;
 import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
 
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class EmergencyActivationButton extends AbstractInput {
-    @Override
-    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
-        if (repository == null) {
-            return new SendMessage(data.getChatId(), "Repository is null");
-        }
+@Service
+public class EmergencyActivationButton extends AbstractButtonInput {
+    @Autowired
+    ActivityButtonChatRepository chatRepository;
 
+    {
+        super.title = "Экстренная активация";
+    }
+
+    @Override
+    public SendMessage handle(SpareMessageData data) {
         String chatId = data.getChatId();
         SendMessage initialMessage = new SendMessage(chatId, "Вы нажали на кнопку активации. Если хотите отменить это действие, введите написанный ранее код деактивации.");
 
@@ -39,9 +44,9 @@ public class EmergencyActivationButton extends AbstractInput {
 
         int secondsRemaining = 60;
 
-        repository.updateCountdownStatus(data.getChatId(), true);
+        chatRepository.updateCountdownStatus(data.getChatId(), true);
         startTimer(sender, secondsRemaining, data.getChatId(), sentMessage.getMessageId());
-        repository.updateCountdownStatus(data.getChatId(), false);
+        chatRepository.updateCountdownStatus(data.getChatId(), false);
 
         return initialMessage;
     }

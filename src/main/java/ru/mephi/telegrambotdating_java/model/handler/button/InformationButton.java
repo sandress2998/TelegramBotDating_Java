@@ -1,14 +1,18 @@
-package ru.mephi.telegrambotdating_java.model.data.button;
+package ru.mephi.telegrambotdating_java.model.handler.button;
 
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
-import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
+import ru.mephi.telegrambotdating_java.model.handler.AbstractButtonInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 
-public class InformationButton extends AbstractInput {
+@Service
+public class InformationButton extends AbstractButtonInput {
+    {
+        title = "Информация";
+    }
 
     @Override
-    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
+    public SendMessage handle(SpareMessageData data) {
         return new SendMessage(data.getChatId(), "Здесь должна быть какая-то информация про приложение.\n" +
             "Но я так устала писать код, что писать еще и тексты у меня не осталось сил");
     }

@@ -1,13 +1,13 @@
-package ru.mephi.telegrambotdating_java.model.data.bad_request;
+package ru.mephi.telegrambotdating_java.model.handler;
 
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
-import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
 import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 
+@Service
 public class UnknownInput extends AbstractInput {
     @Override
-    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
+    public SendMessage handle(SpareMessageData data) {
         return new SendMessage(data.getChatId(), "Неизвестная команда: " + data.getText());
     }
 }

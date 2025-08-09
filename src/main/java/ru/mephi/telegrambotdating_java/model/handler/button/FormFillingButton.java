@@ -1,22 +1,25 @@
-package ru.mephi.telegrambotdating_java.model.data.button;
+package ru.mephi.telegrambotdating_java.model.handler.button;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.mephi.telegrambotdating_java.model.data.AbstractInput;
-import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
-import ru.mephi.telegrambotdating_java.model.data.bad_request.InternalErrorResponse;
 import ru.mephi.telegrambotdating_java.database.entity.ActivityButtonChat;
 import ru.mephi.telegrambotdating_java.database.repository.ActivityButtonChatRepository;
+import ru.mephi.telegrambotdating_java.model.handler.AbstractButtonInput;
+import ru.mephi.telegrambotdating_java.model.data.SpareMessageData;
 
-import java.util.UUID;
+@Service
+public class FormFillingButton extends AbstractButtonInput {
+    @Autowired
+    ActivityButtonChatRepository chatRepository;
 
-public class FormFillingButton extends AbstractInput {
+    {
+        super.title = "Анкета";
+    }
+
     @Override
-    public SendMessage handle(SpareMessageData data, ActivityButtonChatRepository repository) {
-        if (repository == null) {
-            return new InternalErrorResponse(data.getChatId(), "Repository is null");
-        }
-
-        ActivityButtonChat currentForm = repository.getByChatId(data.getChatId());
+    public SendMessage handle(SpareMessageData data) {
+        ActivityButtonChat currentForm = chatRepository.getByChatId(data.getChatId());
         boolean isAllFieldFilled =  currentForm != null &&
                 currentForm.receiverTag != null &&
                 currentForm.deactivationCode != null &&
